@@ -1,5 +1,22 @@
 module ActiveRecord
+
+  module BuildArelWithExtension
+    def build_arel
+      arel = super
+
+      build_with(arel)
+
+      build_rank(arel, rank_value) if rank_value
+
+      arel
+    end
+  end
+
+
   module QueryMethods
+
+    prepend BuildArelWithExtension
+
     class WhereChain
       def overlap(opts, *rest)
         substitute_comparisons(opts, rest, Arel::Nodes::Overlap, 'overlap')
@@ -189,16 +206,6 @@ module ActiveRecord
       self
     end
 
-    def build_arel_with_extensions
-      arel = build_arel_without_extensions
-
-      build_with(arel)
-
-      build_rank(arel, rank_value) if rank_value
-
-      arel
-    end
-
     def build_with(arel)
       with_statements = with_values.flat_map do |with_value|
         case with_value
@@ -255,6 +262,6 @@ module ActiveRecord
       end
     end
 
-    alias_method_chain :build_arel, :extensions
   end
 end
+
