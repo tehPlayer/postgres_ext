@@ -13,7 +13,7 @@ module Arel
                  # Inheritance. see dockyard/postgres_ext#154
                  else
                   cache = a.relation.engine.connection.schema_cache
-                  if cache.table_exists? a.relation.name
+                  if cache.data_source_exists? a.relation.name
                     cache.columns(a.relation.name).find { |col| col.name == a.name.to_s }
                   end
                  end
