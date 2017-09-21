@@ -5,8 +5,7 @@ require 'active_support/concern'
 
 module ActiveRecord
   class PredicateBuilder
-
-    module CallWithFeature
+    module ArrayHandlerPatch
       def call(attribute, value)
         column = case attribute.try(:relation)
                  when Arel::Nodes::TableAlias, NilClass
@@ -19,24 +18,11 @@ module ActiveRecord
         if column && column.respond_to?(:array) && column.array
           attribute.eq(value)
         else
-          super(attribute, value)
+          super
         end
-      end
-    end
-
-
-    module ArrayHandlerPatch
-      extend ActiveSupport::Concern
-
-      included do
-        prepend CallWithFeature
-      end
-
-      module ClassMethods
-
       end
     end
   end
 end
 
-ActiveRecord::PredicateBuilder::ArrayHandler.send(:include, ActiveRecord::PredicateBuilder::ArrayHandlerPatch)
+ActiveRecord::PredicateBuilder::ArrayHandler.prepend(ActiveRecord::PredicateBuilder::ArrayHandlerPatch)
